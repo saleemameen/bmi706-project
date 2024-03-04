@@ -58,3 +58,6 @@ with tab2:
         max_value=dfs_admitted['Table 1']["Year"].max(),
         value=2016
     )
+
+    # Example of filtering via year
+    st.altair_chart(plots.hospitalizations_by_state(dfs_admitted['Table 4'][dfs_admitted['Table 4']['Year'] == year]), use_container_width=True)
