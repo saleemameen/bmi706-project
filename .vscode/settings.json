@@ -1,5 +1,6 @@
 {
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "ms-python.autopep8"
+    "editor.defaultFormatter": "ms-python.autopep8",
+    "autopep8.args": ["--ignore=E501"]
 }
