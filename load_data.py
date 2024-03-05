@@ -20,7 +20,7 @@ def clean_table(xls, sheet_name):
     }
     df.replace(replacements, inplace=True)
     # Step 3: Remove any rows where there exists the words Total | Subtotal | All
-    rows_to_drop = df.apply(lambda row: any(str(cell) == "Total" or str(cell) == "Subtotal" or str(cell) == "All" for cell in row), axis=1)
+    rows_to_drop = df.apply(lambda row: any(str(cell) == "Total" or str(cell) == "Subtotal" or str(cell) == "All" or str(cell) == "People" for cell in row), axis=1)
     df = df[~rows_to_drop]
     # Step 4: Standardize Year Columns to extract only the YYYY
     # - Since sometimes the years are separated with hyphens OR dashes, we need to standardize the names first
@@ -73,4 +73,6 @@ def consumer_outcomes_data():
     sheets = [sheet for sheet in xls.sheet_names if re.match(r'Table NOCC\.\d+', sheet)]
     # Clean the data for each sheet
     dfs = {'Table {}'.format(i + 1): clean_table(xls, sheet_name) for i, sheet_name in enumerate(sheets)}
+    #For table 12, remove the numbers in the HoNOSCA column
+    dfs['Table 8']['HoNOSCA scale'] = dfs['Table 8']['HoNOSCA scale'].str.replace(r'^\d+\.\s*', '', regex=True)
     return dfs

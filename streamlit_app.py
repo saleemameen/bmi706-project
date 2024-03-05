@@ -49,6 +49,8 @@ with tab1:
         # Chart 3: Plot Hospitalizations by Indigenous status
         st.altair_chart(plots.hospitalizations_by_indigenous_status(dfs_admitted['Table 5']), use_container_width=True)
 
+        st.altair_chart(plots.diagnosis_age(dfs_outcomes['Table 12']))
+
 with tab2:
 
     # Year Slider
@@ -61,3 +63,16 @@ with tab2:
 
     # Example of filtering via year
     st.altair_chart(plots.hospitalizations_by_state(dfs_admitted['Table 4'][dfs_admitted['Table 4']['Year'] == year]), use_container_width=True)
+
+
+    st.altair_chart(plots.clinical_outcomes(dfs_outcomes['Table 21'][dfs_outcomes['Table 21']['Year'] == year]), use_container_width=True)
+
+    st.altair_chart(plots.diagnoses(dfs_outcomes['Table 12'][dfs_outcomes['Table 12']['Year'] == year]), use_container_width=True)
+
+    st.altair_chart(plots.distribution_over_time(dfs_outcomes['Table 12']), use_container_width=True)
+
+    st.altair_chart(plots.admission_problems(dfs_outcomes['Table 8'][dfs_outcomes['Table 8']['Year'] == year]), use_container_width=True)
+    #st.dataframe(dfs_outcomes['Table 8'])
+
+    st.altair_chart(plots.age_sex_hopsitalizations(dfs_admitted['Table 3']))
+
