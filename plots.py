@@ -89,6 +89,10 @@ def hospitalizations_by_remoteness(table):
     return chart
 
 def clinical_outcomes(table):
+    consumer_groups = list(table['Consumer group'].unique())
+    selected_consumer_group = st.selectbox("Consumer group", options=consumer_groups)
+    table = table[table['Consumer group'] == selected_consumer_group]
+
     outcome_groups = table.groupby('Outcome group')['Count'].sum().reset_index()
     chart = alt.Chart(outcome_groups).mark_arc(innerRadius = 50).encode(
         theta='Count:Q',
@@ -100,6 +104,15 @@ def clinical_outcomes(table):
     return chart
 
 def diagnoses(table):
+    #filter for clinical setting
+    #clinical_setting = list(table['Setting'].unique()) has an empty string 
+    clinical_setting = ['Acute inpatient', 'Ambulatory']
+    selected_setting = st.radio("Setting", options=clinical_setting)
+    table = table[table['Setting'] == selected_setting]
+    #filter for age  band
+    age_bands = list(table['Age band'].unique())
+    selected_age_band = st.selectbox("Age band", options=age_bands)
+    table = table[table['Age band'] == selected_age_band]
     diagnoses = table.groupby('Principal diagnosis')['Count'].sum().reset_index()
     chart = alt.Chart(diagnoses).mark_bar().encode(
         x=alt.Y('Count:Q', title='Diagnoses'),
@@ -142,6 +155,11 @@ def admission_problems(table):
 def age_sex_hopsitalizations(table):
     table = table[(table['Measure'] == 'Hospitalisations') | (table['Measure'] == 'Patients')]
     table = table[(table['Sex'] == "Female") | (table['Sex'] == 'Male')]
+    ages = list(table['Age group'].unique())
+    default_age = '25–34 years'
+    ages.insert(0, ages.pop(ages.index(default_age)))
+   
+    table = table[(table['Sex'] == "Female") | (table['Sex'] == 'Male')]
 
     # age = st.selectbox("Age", options=table['Age group'].unique(), default='25-34 years')
     # table = table[table['Age group'] == age]
@@ -149,7 +167,8 @@ def age_sex_hopsitalizations(table):
     default_age = '25–34 years'
     ages.insert(0, ages.pop(ages.index(default_age)))
 
-    age = st.selectbox("Age", options=ages) 
+    age = st.selectbox("Age Group", options=ages) 
+    table = table[table['Age group'] == age]
 
     # Continue with your chart creation code...
     chart = alt.Chart(table).mark_bar().encode(
@@ -163,7 +182,6 @@ def age_sex_hopsitalizations(table):
     )
 
     return chart
-
 
 def diagnosis_age(table):
     #some funky non existent category in Age Group
@@ -184,3 +202,12 @@ def diagnosis_age(table):
     return chart
     
 
+def pick_own_variables(table):
+    #pick your own variables
+    x = st.selectbox("X", options=table.columns)
+    y = st.selectbox("Y", options=table.columns)
+    chart = alt.Chart(table).mark_point().encode(
+        x=alt.X(x),
+        y=alt.Y(y)
+    )
+    return chart

@@ -56,7 +56,7 @@ with tab2:
     # Year Slider
     year = st.slider(
         label="Year",
-        min_value=dfs_admitted['Table 1']["Year"].min(),
+        min_value=2014, #set to 2014 as it is the earliest year in the dfs_outcome dataset
         max_value=dfs_admitted['Table 1']["Year"].max(),
         value=2016
     )
@@ -75,4 +75,6 @@ with tab2:
     #st.dataframe(dfs_outcomes['Table 8'])
 
     st.altair_chart(plots.age_sex_hopsitalizations(dfs_admitted['Table 3']))
+
+    st.altair_chart(plots.pick_own_variables(dfs_admitted['Table 3']))
 
