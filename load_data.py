@@ -4,6 +4,11 @@ import pandas as pd
 import re
 
 
+def load_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+
 def clean_table(xls, sheet_name):
     # This is used to prevent pandas from silently automatically downcasting data types
     pd.set_option('future.no_silent_downcasting', True)
@@ -73,6 +78,6 @@ def consumer_outcomes_data():
     sheets = [sheet for sheet in xls.sheet_names if re.match(r'Table NOCC\.\d+', sheet)]
     # Clean the data for each sheet
     dfs = {'Table {}'.format(i + 1): clean_table(xls, sheet_name) for i, sheet_name in enumerate(sheets)}
-    #For table 12, remove the numbers in the HoNOSCA column
+    # For table 12, remove the numbers in the HoNOSCA column
     dfs['Table 8']['HoNOSCA scale'] = dfs['Table 8']['HoNOSCA scale'].str.replace(r'^\d+\.\s*', '', regex=True)
     return dfs

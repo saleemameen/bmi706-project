@@ -10,8 +10,6 @@ def hospitalizations_by_state(table):
         y=alt.Y('Count:Q', title='Hospitalizations'),
         x=alt.X('State:N', title='State', sort='-y'),
         tooltip=['State:N', 'Count:Q']
-    ).properties(
-        title="Hospitalizations by State"
     )
     return chart
 
@@ -26,10 +24,6 @@ def hospitalizations_by_age(table):
         y=alt.Y('Count:Q', title='Hospitalizations'),
         x=alt.X('Age group:N', title='Age Group'),
         tooltip=['Age group:N', 'Count:Q']
-    ).properties(
-        title="Hospitalizations by Age Group",
-        width=600,
-        height=400
     )
     return chart
 
@@ -37,28 +31,16 @@ def hospitalizations_by_age(table):
 def hospitalizations_by_indigenous_status(table):
     indigenous_status = table[(table['Demographic type'] == 'Indigenous status') & (table['Measure'] == 'Hospitalisations')]
     indigenous_status = indigenous_status.groupby('Demographic')['Count'].sum().reset_index()
+
+    # Calculate the total to find percentages
+    total_count = indigenous_status['Count'].sum()
+    indigenous_status['Percentage'] = (indigenous_status['Count'] / total_count * 100).round(1)
+
     # Plot hospitalizations per indigenous status on a donut chart using mark_arc
     chart = alt.Chart(indigenous_status).mark_arc().encode(
         theta='Count:Q',
         color=alt.Color('Demographic:N', title='Indigenous Status'),
-        tooltip=['Demographic:N', 'Count:Q']
-    ).properties(
-        title="Hospitalizations by Indigenous Status"
-    )
-    return chart
-
-
-# df_ac5 = dfs_admitted['Table AC.5']
-def hospitalizations_by_indigenous_status(table):
-    indigenous_status = table[(table['Demographic type'] == 'Indigenous status') & (table['Measure'] == 'Hospitalisations')]
-    indigenous_status = indigenous_status.groupby('Demographic')['Count'].sum().reset_index()
-    # Plot hospitalizations per indigenous status on a donut chart using mark_arc
-    chart = alt.Chart(indigenous_status).mark_arc().encode(
-        theta='Count:Q',
-        color=alt.Color('Demographic:N', title='Indigenous Status'),
-        tooltip=['Demographic:N', 'Count:Q']
-    ).properties(
-        title="Hospitalizations by Indigenous Status"
+        tooltip=['Demographic:N', 'Count:Q', alt.Tooltip('Percentage:Q', title='Percentage')]
     )
     return chart
 
@@ -88,13 +70,14 @@ def hospitalizations_by_remoteness(table):
     )
     return chart
 
+
 def clinical_outcomes(table):
     consumer_groups = list(table['Consumer group'].unique())
     selected_consumer_group = st.selectbox("Consumer group", options=consumer_groups)
     table = table[table['Consumer group'] == selected_consumer_group]
 
     outcome_groups = table.groupby('Outcome group')['Count'].sum().reset_index()
-    chart = alt.Chart(outcome_groups).mark_arc(innerRadius = 50).encode(
+    chart = alt.Chart(outcome_groups).mark_arc(innerRadius=50).encode(
         theta='Count:Q',
         color=alt.Color('Outcome group:N', title='Clinical Outcome', scale=alt.Scale(scheme='viridis')),
         tooltip=['Outcome group:N', 'Count:Q']
@@ -103,13 +86,14 @@ def clinical_outcomes(table):
     )
     return chart
 
+
 def diagnoses(table):
-    #filter for clinical setting
-    #clinical_setting = list(table['Setting'].unique()) has an empty string 
+    # filter for clinical setting
+    # clinical_setting = list(table['Setting'].unique()) has an empty string
     clinical_setting = ['Acute inpatient', 'Ambulatory']
     selected_setting = st.radio("Setting", options=clinical_setting)
     table = table[table['Setting'] == selected_setting]
-    #filter for age  band
+    # filter for age  band
     age_bands = list(table['Age band'].unique())
     selected_age_band = st.selectbox("Age band", options=age_bands)
     table = table[table['Age band'] == selected_age_band]
@@ -123,11 +107,12 @@ def diagnoses(table):
     )
     return chart
 
-def distribution_over_time(table):
-    #distribution = table.groupby(['Year', 'Principal Diagnoses'])['Count'].sum().reset_index()
 
-    default_diagnoses = ['(F32) Depressive episode', '(F31) Bipolar affective disorders','(F20) Schizophrenia', '(F99) Mental disorder not otherwise specified']
-    diagnoses =  st.multiselect("Diagnoses", options=table['Principal diagnosis'].unique(), default=default_diagnoses)
+def distribution_over_time(table):
+    # distribution = table.groupby(['Year', 'Principal Diagnoses'])['Count'].sum().reset_index()
+
+    default_diagnoses = ['(F32) Depressive episode', '(F31) Bipolar affective disorders', '(F20) Schizophrenia', '(F99) Mental disorder not otherwise specified']
+    diagnoses = st.multiselect("Diagnoses", options=table['Principal diagnosis'].unique(), default=default_diagnoses)
 
     distribution = table[table['Principal diagnosis'].isin(diagnoses)].groupby(['Year', 'Principal diagnosis'])['Count'].sum().reset_index()
 
@@ -141,6 +126,7 @@ def distribution_over_time(table):
     )
     return chart
 
+
 def admission_problems(table):
     problems = table.groupby('HoNOSCA scale')['Count'].sum().reset_index()
     chart = alt.Chart(problems).mark_bar().encode(
@@ -152,13 +138,14 @@ def admission_problems(table):
     )
     return chart
 
+
 def age_sex_hopsitalizations(table):
     table = table[(table['Measure'] == 'Hospitalisations') | (table['Measure'] == 'Patients')]
     table = table[(table['Sex'] == "Female") | (table['Sex'] == 'Male')]
     ages = list(table['Age group'].unique())
     default_age = '25–34 years'
     ages.insert(0, ages.pop(ages.index(default_age)))
-   
+
     table = table[(table['Sex'] == "Female") | (table['Sex'] == 'Male')]
 
     # age = st.selectbox("Age", options=table['Age group'].unique(), default='25-34 years')
@@ -167,7 +154,7 @@ def age_sex_hopsitalizations(table):
     default_age = '25–34 years'
     ages.insert(0, ages.pop(ages.index(default_age)))
 
-    age = st.selectbox("Age Group", options=ages) 
+    age = st.selectbox("Age Group", options=ages)
     table = table[table['Age group'] == age]
 
     # Continue with your chart creation code...
@@ -175,16 +162,17 @@ def age_sex_hopsitalizations(table):
         x=alt.X('Year:O', title='Year'),
         y=alt.Y('Count:Q', title='Hospitalizations'),
         tooltip=['Year:O', 'Count:Q'],
-        column = 'Sex:N',
-        color = "Sex:N"
+        column='Sex:N',
+        color="Sex:N"
     ).properties(
         title="Hospitalizations by Year and Age Group"
     )
 
     return chart
 
+
 def diagnosis_age(table):
-    #some funky non existent category in Age Group
+    # some funky non existent category in Age Group
     age_bands = ['11-17 years', '18-64 years', '65 years and over']
     table = table[table['Age band'].isin(age_bands)]
 
@@ -200,10 +188,10 @@ def diagnosis_age(table):
     )
 
     return chart
-    
+
 
 def pick_own_variables(table):
-    #pick your own variables
+    # pick your own variables
     x = st.selectbox("X", options=table.columns)
     y = st.selectbox("Y", options=table.columns)
     chart = alt.Chart(table).mark_point().encode(

@@ -1,0 +1,61 @@
+.block-container {
+    padding-top: 4rem;
+}
+
+div[data-testid="stHorizontalBlock"] {
+    margin-top: 1rem;
+}
+
+div[data-testid="stVerticalBlock"] {
+    gap: 2rem;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"] {
+    padding: 0px;
+    gap: 0;
+    border-width: 2px;
+}
+
+div[data-testid="stArrowVegaLiteChart"] {
+    padding: 1rem;
+}
+
+@media only screen and (max-width: 992px)  {
+    div[data-testid="column"] {
+        width: calc(50% - 2rem);
+        flex: 1 1 calc(50% - 2rem);
+    }
+}
+
+.chart-wrapper.fit-x {
+    width: calc(100% - 1rem) !important;
+}
+
+.chart-wrapper.fit-y {
+    height: calc(100% - 1rem) !important;
+}
+
+.chart-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.banner {
+    background-color: #0284c7;
+    border-radius: calc(0.5rem - 2px);
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    padding: 0;
+    margin-bottom: 0.5rem;
+}
+
+.card-desc {
+    font-size: 0.9rem;
+    margin: 0;
+}
