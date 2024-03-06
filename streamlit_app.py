@@ -30,7 +30,7 @@ st.write("## Mental Health in Australia")
 st.write("Mental Health is a serious concern in Australia. Explore the data to learn more.")
 
 # Setup the Tabs
-tab1, tab2 = st.tabs(["Overview", "Explore in More Detail"])
+tab1, tab2, tab3 = st.tabs(["Overview", "Analysis by Year", "Trends Over Time"])
 
 # Create Tab 1: Overview Tab
 with tab1:
@@ -84,27 +84,48 @@ with tab1:
         )
 
 with tab2:
+    # Provide a Title for the Tab
+    st.markdown(
+        f'''
+            <div class="tab-explainer">
+                <h1 class="card-title">Analysis by Year</h1>
+                <p class="card-desc italics">
+                    Below we show a more detailed snapshot of the mental health crisis and how it has changed year on year. 
+                    The charts are designed to be filterable and interactive.
+                </p>
+            </div>
+            ''',
+        unsafe_allow_html=True
+    )
 
     # Year Slider
     year = st.slider(
-        label="Year",
+        label="Select a Year",
         min_value=2014,  # set to 2014 as it is the earliest year in the dfs_outcome dataset
         max_value=dfs_admitted['Table 1']["Year"].max(),
         value=2016
     )
 
+    # Setup two columns
+    col1, col2 = st.columns(2, gap="medium")
+
+    with col1:
+        with st.container(border=True):
+            ui.banner("Hospitalizations by State", "While hospital admissions for mental health have historically been the highest in New South Wales, followed by Victoria and then Queensland; in recent years, the number of admissions in these states have started to become equivalent.")
+            st.altair_chart(plots.hospitalizations_by_state(dfs_admitted['Table 4'][dfs_admitted['Table 4']['Year'] == year]), use_container_width=True)
+        with st.container(border=True):
+            ui.banner("Clinical Outcomes Relative to Consumer Group", "Depending on the patient's admission status, clinical outcomes can vary. For example, those who complete an acute inpatient admission more often experience significant improvement.", withFilters=True)
+            st.altair_chart(plots.clinical_outcomes(dfs_outcomes['Table 21'][dfs_outcomes['Table 21']['Year'] == year]), use_container_width=True)
+    with col2:
+        with st.container(border=True):
+            ui.banner("Reasons Leading to Hospital Admissions", "There are several different behaviours identified and reported that lead to a mental health admission. The reasons and their frequency of being reported can be observed below.")
+            st.altair_chart(plots.admission_problems(dfs_outcomes['Table 8'][dfs_outcomes['Table 8']['Year'] == year]), use_container_width=True)
+        with st.container(border=True):
+            ui.banner("Diagnosis Based on Admission Status and Age", "Here we show the ICD-10 codes that reveal the types of diagnoses and their frequency based on age and admission setting.", withFilters=True)
+            st.altair_chart(plots.diagnoses(dfs_outcomes['Table 12'][dfs_outcomes['Table 12']['Year'] == year]), use_container_width=True)
+
     # Example of filtering via year
-    st.altair_chart(plots.hospitalizations_by_state(dfs_admitted['Table 4'][dfs_admitted['Table 4']['Year'] == year]), use_container_width=True)
+    # st.altair_chart(plots.distribution_over_time(dfs_outcomes['Table 12']), use_container_width=True)
+    # st.altair_chart(plots.age_sex_hopsitalizations(dfs_admitted['Table 3']))
 
-    st.altair_chart(plots.clinical_outcomes(dfs_outcomes['Table 21'][dfs_outcomes['Table 21']['Year'] == year]), use_container_width=True)
-
-    st.altair_chart(plots.diagnoses(dfs_outcomes['Table 12'][dfs_outcomes['Table 12']['Year'] == year]), use_container_width=True)
-
-    st.altair_chart(plots.distribution_over_time(dfs_outcomes['Table 12']), use_container_width=True)
-
-    st.altair_chart(plots.admission_problems(dfs_outcomes['Table 8'][dfs_outcomes['Table 8']['Year'] == year]), use_container_width=True)
-    # st.dataframe(dfs_outcomes['Table 8'])
-
-    st.altair_chart(plots.age_sex_hopsitalizations(dfs_admitted['Table 3']))
-
-    st.altair_chart(plots.pick_own_variables(dfs_admitted['Table 3']))
+    # st.altair_chart(plots.pick_own_variables(dfs_admitted['Table 3']))

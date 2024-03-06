@@ -77,8 +77,6 @@ def clinical_outcomes(table):
         theta='Count:Q',
         color=alt.Color('Outcome group:N', title='Clinical Outcome', scale=alt.Scale(scheme='viridis')),
         tooltip=['Outcome group:N', 'Count:Q']
-    ).properties(
-        title="Distribution of Clinical Outcomes For Those Receciving Mental Health Care"
     )
     return chart
 
@@ -87,7 +85,7 @@ def diagnoses(table):
     # filter for clinical setting
     # clinical_setting = list(table['Setting'].unique()) has an empty string
     clinical_setting = ['Acute inpatient', 'Ambulatory']
-    selected_setting = st.radio("Setting", options=clinical_setting)
+    selected_setting = st.radio("Setting", options=clinical_setting, horizontal=True)
     table = table[table['Setting'] == selected_setting]
     # filter for age  band
     age_bands = list(table['Age band'].unique())
@@ -98,8 +96,6 @@ def diagnoses(table):
         x=alt.Y('Count:Q', title='Diagnoses'),
         y=alt.X('Principal diagnosis:N', title='Diagnosis', sort='-x'),
         tooltip=['Principal diagnosis:N', 'Count:Q']
-    ).properties(
-        title="Distribution of Diagnoses For Those Receciving Mental Health Care"
     )
     return chart
 
@@ -129,8 +125,6 @@ def admission_problems(table):
         x=alt.Y('Count:Q', title='Admissions'),
         y=alt.X('HoNOSCA scale:N', title='Problem on Admission', sort='-x'),
         tooltip=['HoNOSCA scale:N', 'Count:Q']
-    ).properties(
-        title="Distribution of Behaviours or People Leading to Admission"
     )
     return chart
 

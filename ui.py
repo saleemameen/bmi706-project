@@ -15,3 +15,15 @@ def chart_card(title, desc, plot):
         )
         # Execute the function passed into chart_func
         st.altair_chart(plot, use_container_width=True)
+
+
+def banner(title, desc, withFilters=False):
+    st.markdown(
+        f'''
+            <div class="{'banner with-filters' if withFilters else 'banner'}">
+                <h1 class="card-title">{title}</h1>
+                <p class="card-desc">{desc}</p>
+            </div>
+            ''',
+        unsafe_allow_html=True
+    )
