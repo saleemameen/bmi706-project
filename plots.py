@@ -52,8 +52,6 @@ def hospitalizations_by_socioeconomic_status(table):
         y=alt.Y('Count:Q', title='Hospitalizations'),
         x=alt.X('Demographic:N', title='SEIFA Quintile'),
         tooltip=['Demographic:N', 'Count:Q'],
-    ).properties(
-        title="Hospitalizations by Socioeconomic Status"
     )
     return chart
 
@@ -65,8 +63,6 @@ def hospitalizations_by_remoteness(table):
         y=alt.Y('Count:Q', title='Hospitalizations'),
         x=alt.X('Demographic:N', title='Remoteness Area', sort='-y'),
         tooltip=['Demographic:N', 'Count:Q']
-    ).properties(
-        title="Hospitalizations by Level of Remoteness"
     )
     return chart
 
@@ -183,8 +179,6 @@ def diagnosis_age(table):
         x=alt.X('Count:Q', title='Count'),
         color=alt.Color('Age band:N', title='Age Group'),
         tooltip=['Principal diagnosis:O', 'Count:Q', 'Age band:N']
-    ).properties(
-        title="Hospitalizations by Diagnosis and Age Group"
     )
 
     return chart
