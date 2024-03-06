@@ -124,8 +124,24 @@ with tab2:
             ui.banner("Diagnosis Based on Admission Status and Age", "Here we show the ICD-10 codes that reveal the types of diagnoses and their frequency based on age and admission setting.", withFilters=True)
             st.altair_chart(plots.diagnoses(dfs_outcomes['Table 12'][dfs_outcomes['Table 12']['Year'] == year]), use_container_width=True)
 
-    # Example of filtering via year
-    # st.altair_chart(plots.distribution_over_time(dfs_outcomes['Table 12']), use_container_width=True)
-    # st.altair_chart(plots.age_sex_hopsitalizations(dfs_admitted['Table 3']))
+    with tab3:
+        # Provide a Title for the Tab
+        st.markdown(
+            f'''
+                <div class="tab-explainer">
+                    <h1 class="card-title">Trends Over Time</h1>
+                    <p class="card-desc italics">
+                        Below you can observe how the diagnostic landscape has been changing over time. If you scroll over a line chart, it will zoom in to provide greater detail.
+                    </p>
+                </div>
+                ''',
+            unsafe_allow_html=True
+        )
+        with st.container(border=True):
+            ui.banner("Number of Hospitalizations by Diagnosis Over Time", "Diagnostic trends have been changing over time. You can select specific diagnoses based on ICD-10 codes below and compare how they have changed over time.")
+            st.altair_chart(plots.hospitalizations_by_diagnosis_over_time(dfs_outcomes['Table 12']), use_container_width=True)
+        with st.container(border=True):
+            ui.banner("Hospitalizations by Year and Age Group Over Time", "The number of hospitalizations based according to Age and Sex has also been changing over time. Explore the trends in the changing landscape below.", withFilters=True)
+            st.altair_chart(plots.hospitalizations_by_age_sex_over_time(dfs_admitted['Table 3']), use_container_width=True)
 
     # st.altair_chart(plots.pick_own_variables(dfs_admitted['Table 3']))

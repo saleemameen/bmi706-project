@@ -100,7 +100,17 @@ def diagnoses(table):
     return chart
 
 
-def distribution_over_time(table):
+def admission_problems(table):
+    problems = table.groupby('HoNOSCA scale')['Count'].sum().reset_index()
+    chart = alt.Chart(problems).mark_bar().encode(
+        x=alt.Y('Count:Q', title='Admissions'),
+        y=alt.X('HoNOSCA scale:N', title='Problem on Admission', sort='-x'),
+        tooltip=['HoNOSCA scale:N', 'Count:Q']
+    )
+    return chart
+
+
+def hospitalizations_by_diagnosis_over_time(table):
     # distribution = table.groupby(['Year', 'Principal Diagnoses'])['Count'].sum().reset_index()
 
     default_diagnoses = ['(F32) Depressive episode', '(F31) Bipolar affective disorders', '(F20) Schizophrenia', '(F99) Mental disorder not otherwise specified']
@@ -113,23 +123,11 @@ def distribution_over_time(table):
         y=alt.Y('Count:Q', title='Hospitalizations'),
         tooltip=['Year:O', 'Count:Q'],
         color='Principal diagnosis:N',
-    ).properties(
-        title="Distribution of Hospitalizations Over Time by Diagnosis"
-    )
+    ).interactive()
     return chart
 
 
-def admission_problems(table):
-    problems = table.groupby('HoNOSCA scale')['Count'].sum().reset_index()
-    chart = alt.Chart(problems).mark_bar().encode(
-        x=alt.Y('Count:Q', title='Admissions'),
-        y=alt.X('HoNOSCA scale:N', title='Problem on Admission', sort='-x'),
-        tooltip=['HoNOSCA scale:N', 'Count:Q']
-    )
-    return chart
-
-
-def age_sex_hopsitalizations(table):
+def hospitalizations_by_age_sex_over_time(table):
     table = table[(table['Measure'] == 'Hospitalisations') | (table['Measure'] == 'Patients')]
     table = table[(table['Sex'] == "Female") | (table['Sex'] == 'Male')]
     ages = list(table['Age group'].unique())
@@ -144,7 +142,7 @@ def age_sex_hopsitalizations(table):
     default_age = '25–34 years'
     ages.insert(0, ages.pop(ages.index(default_age)))
 
-    age = st.selectbox("Age Group", options=ages)
+    age = st.selectbox("Select Age Group", options=ages)
     table = table[table['Age group'] == age]
 
     # Continue with your chart creation code...
@@ -154,8 +152,6 @@ def age_sex_hopsitalizations(table):
         tooltip=['Year:O', 'Count:Q'],
         column='Sex:N',
         color="Sex:N"
-    ).properties(
-        title="Hospitalizations by Year and Age Group"
     )
 
     return chart
