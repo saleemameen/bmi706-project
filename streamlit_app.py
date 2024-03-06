@@ -35,9 +35,18 @@ tab1, tab2 = st.tabs(["Overview", "Explore in More Detail"])
 # Create Tab 1: Overview Tab
 with tab1:
     # Provide a Title for the Tab
-    st.write("#### Key Trends and Statistics")
-    st.write("Below we show a snapshot of the mental health crisis in Australia.")
-    st.write(":blue[For a more detailed and interactive exploration, select the explore in more detail tab above.]")
+    st.markdown(
+        f'''
+            <div class="tab-explainer">
+                <h1 class="card-title">Overview: Key Trends and Statistics</h1>
+                <p class="card-desc italics">
+                    Below we show a snapshot of the mental health crisis in Australia. 
+                    For a more detailed and interactive exploration, select the explore in more detail tab above.
+                </p>
+            </div>
+            ''',
+        unsafe_allow_html=True
+    )
     # Setup three columns
     col1, col2, col3 = st.columns(3, gap="medium")
     with col1:
