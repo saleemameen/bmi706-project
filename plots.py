@@ -111,13 +111,9 @@ def admission_problems(table):
 
 
 def hospitalizations_by_diagnosis_over_time(table):
-    # distribution = table.groupby(['Year', 'Principal Diagnoses'])['Count'].sum().reset_index()
-
     default_diagnoses = ['(F32) Depressive episode', '(F31) Bipolar affective disorders', '(F20) Schizophrenia', '(F99) Mental disorder not otherwise specified']
     diagnoses = st.multiselect("Diagnoses", options=table['Principal diagnosis'].unique(), default=default_diagnoses)
-
     distribution = table[table['Principal diagnosis'].isin(diagnoses)].groupby(['Year', 'Principal diagnosis'])['Count'].sum().reset_index()
-
     chart = alt.Chart(distribution).mark_line().encode(
         x=alt.X('Year:O', title='Year'),
         y=alt.Y('Count:Q', title='Hospitalizations'),
@@ -133,26 +129,22 @@ def hospitalizations_by_age_sex_over_time(table):
     ages = list(table['Age group'].unique())
     default_age = '25–34 years'
     ages.insert(0, ages.pop(ages.index(default_age)))
-
-    table = table[(table['Sex'] == "Female") | (table['Sex'] == 'Male')]
-
-    # age = st.selectbox("Age", options=table['Age group'].unique(), default='25-34 years')
-    # table = table[table['Age group'] == age]
-    ages = list(table['Age group'].unique())
-    default_age = '25–34 years'
-    ages.insert(0, ages.pop(ages.index(default_age)))
-
     age = st.selectbox("Select Age Group", options=ages)
-    table = table[table['Age group'] == age]
-
-    # Continue with your chart creation code...
-    chart = alt.Chart(table).mark_bar().encode(
+    table = table[table['Age group'] == age].groupby(['Year', 'Sex'])['Count'].sum().reset_index()
+    chart = alt.Chart(table).mark_line().encode(
         x=alt.X('Year:O', title='Year'),
         y=alt.Y('Count:Q', title='Hospitalizations'),
         tooltip=['Year:O', 'Count:Q'],
-        column='Sex:N',
-        color="Sex:N"
-    )
+        color='Sex:N',
+    ).interactive()
+
+    # chart = alt.Chart(table).mark_bar().encode(
+    #     x=alt.X('Year:O', title='Year'),
+    #     y=alt.Y('Count:Q', title='Hospitalizations'),
+    #     tooltip=['Year:O', 'Count:Q'],
+    #     column='Sex:N',
+    #     color="Sex:N"
+    # )
 
     return chart
 
