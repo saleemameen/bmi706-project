@@ -1,5 +1,4 @@
 import streamlit as st
-import altair as alt
 import plots
 import load_data
 import ui
