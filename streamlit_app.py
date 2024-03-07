@@ -113,15 +113,17 @@ with tab2:
             ui.banner("Hospitalizations by State", "While hospital admissions for mental health have historically been the highest in New South Wales, followed by Victoria and then Queensland; in recent years, the number of admissions in these states have started to become equivalent.")
             st.altair_chart(plots.hospitalizations_by_state(dfs_admitted['Table 4'][dfs_admitted['Table 4']['Year'] == year]), use_container_width=True)
         with st.container(border=True):
-            ui.banner("Clinical Outcomes Relative to Consumer Group", "Depending on the patient's admission status, clinical outcomes can vary. For example, those who complete an acute inpatient admission more often experience significant improvement.", withFilters=True)
-            st.altair_chart(plots.clinical_outcomes(dfs_outcomes['Table 21'][dfs_outcomes['Table 21']['Year'] == year]), use_container_width=True)
+            ui.banner("Clinical Outcomes Relative to Consumer Group", "Depending on the patient's admission status, clinical outcomes can vary. For example, those who complete an acute inpatient admission more often experience significant improvement. You can choose the consumer group with the filter below. Please note that this also filters the Diagnoses table in this tab.", withFilters=True)
+            chart, filter_param = plots.clinical_outcomes(dfs_outcomes['Table 21'][dfs_outcomes['Table 21']['Year'] == year])
+            #st.altair_chart(plots.clinical_outcomes(dfs_outcomes['Table 21'][dfs_outcomes['Table 21']['Year'] == year]), use_container_width=True)
+            st.altair_chart(chart, use_container_width=True)
     with col2:
         with st.container(border=True):
             ui.banner("Reasons Leading to Hospital Admissions", "There are several different behaviours identified and reported that lead to a mental health admission. The reasons and their frequency of being reported can be observed below.")
             st.altair_chart(plots.admission_problems(dfs_outcomes['Table 8'][dfs_outcomes['Table 8']['Year'] == year]), use_container_width=True)
         with st.container(border=True):
-            ui.banner("Diagnosis Based on Admission Status and Age", "Here we show the ICD-10 codes that reveal the types of diagnoses and their frequency based on age and admission setting.", withFilters=True)
-            st.altair_chart(plots.diagnoses(dfs_outcomes['Table 12'][dfs_outcomes['Table 12']['Year'] == year]), use_container_width=True)
+            ui.banner("Diagnosis Based on Admission Status and Age", "Here we show the ICD-10 codes that reveal the types of diagnoses and their frequency based on age and admission setting. To filter this chart according to the consumer group (i.e. acute inpatient versus ambulatory care), select the option on the donut chart and it will automatically filter this chart as well.", withFilters=True)
+            st.altair_chart(plots.diagnoses(dfs_outcomes['Table 12'][dfs_outcomes['Table 12']['Year'] == year], filter_param), use_container_width=True)
 
     with tab3:
         # Provide a Title for the Tab
@@ -137,10 +139,11 @@ with tab2:
             unsafe_allow_html=True
         )
         with st.container(border=True):
-            ui.banner("Number of Hospitalizations by Diagnosis Over Time", "Diagnostic trends have been changing over time. You can select specific diagnoses based on ICD-10 codes below and compare how they have changed over time.")
-            st.altair_chart(plots.hospitalizations_by_diagnosis_over_time(dfs_outcomes['Table 12']), use_container_width=True)
+            ui.banner("Number of Hospitalizations by Diagnosis Over Time", "Diagnostic trends have been changing over time. You can select specific diagnoses based on ICD-10 codes below and compare how they have changed over time. Select an age group to view, and this will also filter the Hospitalizations by Year and Age Group Over Time chart below.")
+            chart, filter_param = plots.hospitalizations_by_diagnosis_over_time(dfs_outcomes['Table 12'])
+            st.altair_chart(chart, use_container_width=True)
         with st.container(border=True):
-            ui.banner("Hospitalizations by Year and Age Group Over Time", "The number of hospitalizations based according to Age and Sex has also been changing over time. Explore the trends in the changing landscape below.", withFilters=True)
-            st.altair_chart(plots.hospitalizations_by_age_sex_over_time(dfs_admitted['Table 3']), use_container_width=True)
+            ui.banner("Hospitalizations by Year and Age Group Over Time", "The number of hospitalizations based according to Age and Sex has also been changing over time. Explore the trends in the changing landscape below. To filter this chart, please select an age group filter from the Diagnoses chart above.", withFilters=True)
+            st.altair_chart(plots.hospitalizations_by_age_sex_over_time(dfs_admitted['Table 3'], filter_param), use_container_width=True)
 
     # st.altair_chart(plots.pick_own_variables(dfs_admitted['Table 3']))

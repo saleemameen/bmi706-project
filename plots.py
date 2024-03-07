@@ -68,6 +68,12 @@ def hospitalizations_by_remoteness(table):
 
 
 def clinical_outcomes(table):
+    #change the consumer group "Completed inpatient care to Acute inpatient"
+    table['Consumer group'] = table['Consumer group'].replace('Completed acute inpatient', 'Acute inpatient')
+    #change consumer group "Completed ambulatory care to Ambulatory"
+    table['Consumer group'] = table['Consumer group'].replace('Completed ambulatory', 'Ambulatory')
+    #change consuer group "Ongoing ambulatory to Ambulatory"
+    table['Consumer group'] = table['Consumer group'].replace('Ongoing ambulatory', 'Ambulatory')
     consumer_groups = list(table['Consumer group'].unique())
     selected_consumer_group = st.selectbox("Consumer group", options=consumer_groups)
     table = table[table['Consumer group'] == selected_consumer_group]
@@ -78,15 +84,16 @@ def clinical_outcomes(table):
         color=alt.Color('Outcome group:N', title='Clinical Outcome', scale=alt.Scale(scheme='viridis')),
         tooltip=['Outcome group:N', 'Count:Q']
     )
-    return chart
+    return chart, selected_consumer_group
 
 
-def diagnoses(table):
+def diagnoses(table, filter_param):
     # filter for clinical setting
     # clinical_setting = list(table['Setting'].unique()) has an empty string
-    clinical_setting = ['Acute inpatient', 'Ambulatory']
-    selected_setting = st.radio("Setting", options=clinical_setting, horizontal=True)
-    table = table[table['Setting'] == selected_setting]
+    #clinical_setting = ['Acute inpatient', 'Ambulatory']
+    #selected_setting = st.radio("Setting", options=clinical_setting, horizontal=True)
+    #table = table[table['Setting'] == selected_setting]
+    table = table[table['Setting'] == filter_param]
     # filter for age  band
     age_bands = list(table['Age band'].unique())
     selected_age_band = st.selectbox("Age band", options=age_bands)
@@ -111,7 +118,16 @@ def admission_problems(table):
 
 
 def hospitalizations_by_diagnosis_over_time(table):
-    default_diagnoses = ['(F32) Depressive episode', '(F31) Bipolar affective disorders', '(F20) Schizophrenia', '(F99) Mental disorder not otherwise specified']
+    #remove empty string from Principal diagnosis
+    table = table[table['Principal diagnosis'] != ' ']
+    #add age filter from column Age band
+    ages = list(table['Age band'].unique())
+    default_age = "18-64 years"
+    ages.insert(0, ages.pop(ages.index(default_age)))
+    selected_age_band = st.selectbox("Ages", options=ages)
+    table = table[table['Age band'] == selected_age_band]
+    default_diagnoses = ['(F32) Depressive episode', '(F99) Mental disorder not otherwise specified']
+    #default_diagnoses = ['(F32) Depressive episode', '(F31) Bipolar affective disorders', '(F20) Schizophrenia']
     diagnoses = st.multiselect("Diagnoses", options=table['Principal diagnosis'].unique(), default=default_diagnoses)
     distribution = table[table['Principal diagnosis'].isin(diagnoses)].groupby(['Year', 'Principal diagnosis'])['Count'].sum().reset_index()
     chart = alt.Chart(distribution).mark_line().encode(
@@ -120,17 +136,34 @@ def hospitalizations_by_diagnosis_over_time(table):
         tooltip=['Year:O', 'Count:Q'],
         color='Principal diagnosis:N',
     ).interactive()
-    return chart
+    return chart, selected_age_band
 
 
-def hospitalizations_by_age_sex_over_time(table):
+def hospitalizations_by_age_sex_over_time(table, filter_param):
+    #remove age group 0-11
+    table = table[table['Age group'] != '0–11 years']
+    #rename age group 18-24 to 18-64
+    table['Age group'] = table['Age group'].replace('12–17 years', '11-17 years')
+    table['Age group'] = table['Age group'].replace('18–24 years', '18-64 years')
+    #do the same for other age groups
+    table['Age group'] = table['Age group'].replace('25–34 years', '18-64 years')
+    table['Age group'] = table['Age group'].replace('35–44 years', '18-64 years')
+    table['Age group'] = table['Age group'].replace('45–54 years', '18-64 years')
+    table['Age group'] = table['Age group'].replace('55–64 years', '18-64 years')
+    #rename other ages to 65 years and over
+    table['Age group'] = table['Age group'].replace('65–74 years', '65 years and over')
+    table['Age group'] = table['Age group'].replace('75–84 years', '65 years and over')
+    table['Age group'] = table['Age group'].replace('85 years and over', '65 years and over')
+    table['Age group'] = table['Age group'].replace('85 years and older', '65 years and over')
+                                                    
+
     table = table[(table['Measure'] == 'Hospitalisations') | (table['Measure'] == 'Patients')]
     table = table[(table['Sex'] == "Female") | (table['Sex'] == 'Male')]
-    ages = list(table['Age group'].unique())
-    default_age = '25–34 years'
-    ages.insert(0, ages.pop(ages.index(default_age)))
-    age = st.selectbox("Select Age Group", options=ages)
-    table = table[table['Age group'] == age].groupby(['Year', 'Sex'])['Count'].sum().reset_index()
+    #ages = list(table['Age group'].unique())
+    #default_age = '18–64 years'
+    #ages.insert(0, ages.pop(ages.index(default_age)))
+    #age = st.selectbox("Select Age Group", options=ages)
+    table = table[table['Age group'] == filter_param].groupby(['Year', 'Sex'])['Count'].sum().reset_index()
     chart = alt.Chart(table).mark_line().encode(
         x=alt.X('Year:O', title='Year'),
         y=alt.Y('Count:Q', title='Hospitalizations'),
